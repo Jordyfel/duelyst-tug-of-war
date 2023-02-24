@@ -1,0 +1,30 @@
+[gd_scene load_steps=5 format=3 uid="uid://dotkemiv3r2ka"]
+
+[ext_resource type="PackedScene" uid="uid://dtxadb47bemct" path="res://source/unit.tscn" id="1_6vlpp"]
+[ext_resource type="SpriteFrames" uid="uid://cdtu0js66e62u" path="res://addons/duelyst_animated_sprites/assets/spriteframes/units/f3_desertspirit.tres" id="2_4w48b"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_stsop"]
+size = Vector2(63, 40)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_m5gdm"]
+radius = 30.0
+
+[node name="Unit" instance=ExtResource("1_6vlpp")]
+max_health = 60
+movement_speed = 150.0
+attack_damage = 25
+attack_keyframe = 9
+
+[node name="CollisionShape2D" parent="." index="0"]
+position = Vector2(-1.5, -1)
+shape = SubResource("RectangleShape2D_stsop")
+
+[node name="AnimatedSprite2D" parent="." index="1"]
+position = Vector2(-1, -26)
+sprite_frames = ExtResource("2_4w48b")
+animation = &"run"
+frame = 1
+frame_progress = 0.540028
+
+[node name="RangeShape" parent="RangeArea" index="0"]
+shape = SubResource("CircleShape2D_m5gdm")

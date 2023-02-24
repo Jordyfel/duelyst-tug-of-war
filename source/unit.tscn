@@ -1,0 +1,62 @@
+[gd_scene load_steps=5 format=3 uid="uid://dtxadb47bemct"]
+
+[ext_resource type="Script" path="res://source/unit.gd" id="1_i0afq"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_76c61"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/sync = true
+properties/1/path = NodePath("AnimatedSprite2D:frame")
+properties/1/spawn = true
+properties/1/sync = true
+properties/2/path = NodePath(".:max_health")
+properties/2/spawn = false
+properties/2/sync = true
+properties/3/path = NodePath(".:movement_speed")
+properties/3/spawn = false
+properties/3/sync = true
+properties/4/path = NodePath(".:health")
+properties/4/spawn = false
+properties/4/sync = true
+properties/5/path = NodePath("AnimatedSprite2D:flip_h")
+properties/5/spawn = true
+properties/5/sync = true
+properties/6/path = NodePath("AnimatedSprite2D:animation")
+properties/6/spawn = true
+properties/6/sync = true
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mseml"]
+draw_center = false
+shadow_size = 1
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cc7kq"]
+bg_color = Color(0, 1, 0.219608, 1)
+
+[node name="Unit" type="CharacterBody2D"]
+collision_layer = 2
+script = ExtResource("1_i0afq")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 7)
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_76c61")
+
+[node name="ProgressBar" type="ProgressBar" parent="."]
+visible = false
+offset_left = -30.0
+offset_top = -30.0
+offset_right = 30.0
+offset_bottom = -26.0
+theme_override_styles/background = SubResource("StyleBoxFlat_mseml")
+theme_override_styles/fill = SubResource("StyleBoxFlat_cc7kq")
+show_percentage = false
+
+[node name="RangeArea" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 2
+monitorable = false
+
+[node name="RangeShape" type="CollisionShape2D" parent="RangeArea"]

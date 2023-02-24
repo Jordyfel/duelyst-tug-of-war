@@ -1,0 +1,6 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://r5ryo3vp6pej"]
+
+[ext_resource type="FontFile" uid="uid://cdyhsq24hrjjw" path="res://themes/Exo_2/static/Exo2-Regular.ttf" id="1_pmkxr"]
+
+[resource]
+default_font = ExtResource("1_pmkxr")

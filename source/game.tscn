@@ -1,0 +1,103 @@
+[gd_scene load_steps=6 format=3 uid="uid://uunr1pnj12q6"]
+
+[ext_resource type="Script" path="res://source/game.gd" id="1_v0bo8"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7b7ur"]
+bg_color = Color(0.862745, 0.862745, 0.862745, 1)
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_mcjjv"]
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_bcvr1"]
+normal = Vector2(1, 0)
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_6v2hl"]
+normal = Vector2(-1, 0)
+
+[node name="Game" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_v0bo8")
+
+[node name="BottomBar" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="BottomBar"]
+layout_mode = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 20
+
+[node name="HBoxContainer" type="HBoxContainer" parent="BottomBar/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="RetreatButton" type="Button" parent="BottomBar/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(180, 60)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 24
+text = "Retreat"
+
+[node name="AttackButton" type="Button" parent="BottomBar/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(180, 60)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 24
+text = "Attack
+"
+
+[node name="Background" type="Panel" parent="."]
+custom_minimum_size = Vector2(0, 700)
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_7b7ur")
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("res://source/units/test_unit.tscn", "res://source/units/test_unit_2.tscn")
+spawn_path = NodePath("..")
+
+[node name="Floor" type="StaticBody2D" parent="."]
+position = Vector2(0, 650)
+
+[node name="Ground" type="Line2D" parent="Floor"]
+points = PackedVector2Array(0, 0, 1600, 0)
+width = 2.0
+default_color = Color(0.227451, 0.227451, 0.227451, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor"]
+shape = SubResource("WorldBoundaryShape2D_mcjjv")
+
+[node name="LeftWall" type="StaticBody2D" parent="."]
+position = Vector2(0, 650)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LeftWall"]
+shape = SubResource("WorldBoundaryShape2D_bcvr1")
+
+[node name="RightWall" type="StaticBody2D" parent="."]
+position = Vector2(1600, 650)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RightWall"]
+shape = SubResource("WorldBoundaryShape2D_6v2hl")
+
+[node name="Player1UnitSpawn" type="Marker2D" parent="."]
+position = Vector2(100, 550)
+
+[node name="Player2UnitSpawn" type="Marker2D" parent="."]
+position = Vector2(1500, 550)
+
+[connection signal="pressed" from="BottomBar/MarginContainer/HBoxContainer/RetreatButton" to="." method="_on_retreat_button_pressed"]
+[connection signal="pressed" from="BottomBar/MarginContainer/HBoxContainer/AttackButton" to="." method="_on_attack_button_pressed"]
