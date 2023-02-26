@@ -1,0 +1,34 @@
+[gd_scene load_steps=5 format=3 uid="uid://7au2po6mi7aj"]
+
+[ext_resource type="PackedScene" uid="uid://c4ga71kv8fm1a" path="res://source/general.tscn" id="1_e1e6g"]
+[ext_resource type="SpriteFrames" uid="uid://dj3ietpaevobw" path="res://addons/duelyst_animated_sprites/assets/spriteframes/units/f1_altgeneraltier2.tres" id="2_fk3hc"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_r6ajm"]
+size = Vector2(101, 108)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_auc87"]
+radius = 80.0
+
+[node name="General" instance=ExtResource("1_e1e6g")]
+max_health = 500
+attack_damage = 30
+_attack_keyframe = 14
+
+[node name="CollisionShape2D" parent="." index="0"]
+position = Vector2(-4.5, -5)
+shape = SubResource("RectangleShape2D_r6ajm")
+
+[node name="AnimatedSprite2D" parent="." index="1"]
+position = Vector2(1, -45)
+scale = Vector2(2, 2)
+sprite_frames = ExtResource("2_fk3hc")
+animation = &"idle"
+
+[node name="ProgressBar" parent="." index="3"]
+offset_left = -90.0
+offset_top = -98.0
+offset_right = 94.0
+offset_bottom = -86.0
+
+[node name="RangeShape" parent="RangeArea" index="0"]
+shape = SubResource("CircleShape2D_auc87")

@@ -4,7 +4,10 @@ extends Control
 
 enum Command {RETREAT, ATTACK_MOVE}
 
-var player_last_command: Dictionary = {&"player_1": Command.ATTACK_MOVE, &"player_2": Command.ATTACK_MOVE}
+var player_last_command: Dictionary = {
+	&"player_1": Command.ATTACK_MOVE,
+	&"player_2": Command.ATTACK_MOVE,
+}
 
 @onready var spawner: MultiplayerSpawner = $MultiplayerSpawner
 @onready var player_1_unit_spawn:= $Player1UnitSpawn
@@ -21,10 +24,23 @@ func _ready() -> void:
 
 # Called only on the server
 func start_game() -> void:
+	spawn_general("res://source/generals/test_general.tscn", &"player_1")
+	spawn_general("res://source/generals/test_general.tscn", &"player_2")
+	
 	while(true):
 		spawn_unit("res://source/units/test_unit.tscn", player_1_unit_spawn.position, &"player_1")
 		spawn_unit("res://source/units/test_unit_2.tscn", player_2_unit_spawn.position, &"player_2")
 		await get_tree().create_timer(5).timeout
+
+
+func spawn_general(scene_path: String, player_group: StringName) -> void:
+	var general: General = load(scene_path).instantiate()
+	if player_group == &"player_1":
+		general.position = $Player1GeneralPosition.position
+	elif player_group == &"player_2":
+		general.position = $Player2GeneralPosition.position
+	general.set_player(player_group)
+	add_child(general, true)
 
 
 func spawn_unit(scene_path: String, unit_position: Vector2, player_group: StringName) -> void:
@@ -49,11 +65,12 @@ func execute_command(command: Command) -> void:
 	player_last_command[player_group] = command
 	
 	for unit in get_tree().get_nodes_in_group(player_group):
-		match command:
-			Command.RETREAT:
-				unit.retreat()
-			Command.ATTACK_MOVE:
-				unit.attack_move()
+		if unit is Unit:
+			match command:
+				Command.RETREAT:
+					unit.retreat()
+				Command.ATTACK_MOVE:
+					unit.attack_move()
 
 
 func _on_retreat_button_pressed() -> void:

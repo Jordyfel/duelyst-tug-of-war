@@ -10,10 +10,12 @@ size = Vector2(63, 40)
 radius = 30.0
 
 [node name="Unit" instance=ExtResource("1_6vlpp")]
+initial_spawn_time = 1
+spawn_time = 2
 max_health = 60
 movement_speed = 150.0
 attack_damage = 25
-attack_keyframe = 9
+_attack_keyframe = 9
 
 [node name="CollisionShape2D" parent="." index="0"]
 position = Vector2(-1.5, -1)

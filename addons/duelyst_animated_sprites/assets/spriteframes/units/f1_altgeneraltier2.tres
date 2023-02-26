@@ -1,6 +1,6 @@
 [gd_resource type="SpriteFrames" load_steps=118 format=3 uid="uid://dj3ietpaevobw"]
 
-[ext_resource type="Texture2D" uid="uid://cwxayataso3rk" path="res://addons/duelyst_animated_sprites/assets/spritesheets/units/f1_altgeneraltier2.png" id="1_vgc0c"]
+[ext_resource type="Texture2D" uid="uid://doehv2jcv7cat" path="res://addons/duelyst_animated_sprites/assets/spritesheets/units/f1_altgeneraltier2.png" id="1_vgc0c"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_h5bu7"]
 atlas = ExtResource("1_vgc0c")
