@@ -3,17 +3,22 @@ class_name Unit
 
 
 
+signal action_changed
+signal enemy_entered_range
+signal reached_target_position
+
 signal attack_keyframe_reached
-#signal enemy_entered_range(enemy: Node2D)
-signal move_interrupt(why: InterruptReason)
-signal attack_interrupt(why: InterruptReason)
+signal attack_finished
 
 enum MovementMode {RIGHT, LEFT, STILL}
-enum InterruptReason {CHANGE_ACTION, ENEMY_ENTERED_RANGE, ATTACK_FINISHED}
+
+const POSITION_VARIANCE = 10.0
 
 var _gravity: int = ProjectSettings.get_setting("physics/2d/default_gravity")
 var _my_player_group: StringName
 var _enemy_player_group: StringName
+var _retreat_position: float
+var _move_target_position:= 800.0
 
 var _movement_mode:= MovementMode.STILL:
 	set(new_mode):
@@ -32,6 +37,7 @@ var health: int:
 		if new_health == 0:
 			_die()
 
+@export var retreat_distance_from_wall:= 150.0
 @export var initial_spawn_time: int
 @export var spawn_time: int
 
@@ -80,6 +86,10 @@ func _physics_process(delta: float) -> void:
 				velocity.x = 0.0
 	
 	move_and_slide()
+	
+	if position.x - POSITION_VARIANCE < _move_target_position:
+		if position.x + POSITION_VARIANCE > _move_target_position:
+			reached_target_position.emit()
 
 
 func set_player(player: StringName) -> void:
@@ -87,46 +97,89 @@ func set_player(player: StringName) -> void:
 	_my_player_group = player
 	match player:
 		&"player_1":
+			_retreat_position = retreat_distance_from_wall
 			_enemy_player_group = &"player_2"
 		&"player_2":
+			# The literal should be adapted to level size.
+			_retreat_position = 1600 - retreat_distance_from_wall
 			_enemy_player_group = &"player_1"
 
 
-func attack_move() -> void:
-	move_interrupt.emit(InterruptReason.CHANGE_ACTION)
-	attack_interrupt.emit(InterruptReason.CHANGE_ACTION)
+func attack_move(target_position: float) -> void:
+	action_changed.emit()
+	_move_target_position = randf_range(
+			target_position - POSITION_VARIANCE, target_position + POSITION_VARIANCE)
 	while(true):
 		if _range_area.get_overlapping_bodies().any(
 				func is_enemy(node: Node2D) -> bool: return node.is_in_group(_enemy_player_group)):
 			_attack()
-			var reason = await attack_interrupt
-			if reason == InterruptReason.ATTACK_FINISHED:
+			var promise = PromiseAny.new([attack_finished, action_changed])
+			var source = await promise.completed
+			if source == attack_finished:
 				continue
-			elif reason == InterruptReason.CHANGE_ACTION:
+			elif source == action_changed:
 				break
-		match _my_player_group:
-			&"player_1":
-				_movement_mode = MovementMode.RIGHT
-			&"player_2":
-				_movement_mode = MovementMode.LEFT
+		
+		if target_position - POSITION_VARIANCE > position.x:
+			_movement_mode = MovementMode.RIGHT
+		elif target_position + POSITION_VARIANCE < position.x:
+			_movement_mode = MovementMode.LEFT
+		else:
+			_hold_your_ground()
+			break
 		_animated_sprite.play(&"run")
-		var reason = await move_interrupt
-		if reason == InterruptReason.ENEMY_ENTERED_RANGE:
+		
+		var promise = PromiseAny.new([enemy_entered_range, action_changed, reached_target_position])
+		var source = await promise.completed
+		if source == enemy_entered_range:
 			continue
-		elif reason == InterruptReason.CHANGE_ACTION:
+		elif source == action_changed:
+			break
+		elif source == reached_target_position:
+			_hold_your_ground()
+			break
+
+
+func _hold_your_ground() -> void:
+	_movement_mode = MovementMode.STILL
+	while(true):
+		if _range_area.get_overlapping_bodies().any(
+				func is_enemy(node: Node2D) -> bool: return node.is_in_group(_enemy_player_group)):
+			_attack()
+			var promise = PromiseAny.new([attack_finished, action_changed])
+			var source = await promise.completed
+			if source == attack_finished:
+				continue
+			elif source == action_changed:
+				break
+		_animated_sprite.play(&"idle")
+		var promise = PromiseAny.new([enemy_entered_range, action_changed])
+		var source = await promise.completed
+		if source == enemy_entered_range:
+			continue
+		elif source == action_changed:
 			break
 
 
 func retreat() -> void:
-	attack_interrupt.emit(InterruptReason.CHANGE_ACTION)
-	move_interrupt.emit(InterruptReason.CHANGE_ACTION)
+	action_changed.emit()
+	_move_target_position = _retreat_position
 	if _animated_sprite.get_animation() == &"attack":
 		await _animated_sprite.animation_looped
-	_animated_sprite.play(&"run")
-	if _my_player_group == &"player_1":
-		_movement_mode = MovementMode.LEFT
-	elif _my_player_group == &"player_2":
+	
+	if _move_target_position - POSITION_VARIANCE > position.x:
 		_movement_mode = MovementMode.RIGHT
+	elif _move_target_position + POSITION_VARIANCE < position.x:
+		_movement_mode = MovementMode.LEFT
+	else:
+		_hold_your_ground()
+		return
+	_animated_sprite.play(&"run")
+	
+	var promise = PromiseAny.new([action_changed, reached_target_position])
+	var source = await promise.completed
+	if source == reached_target_position:
+		_hold_your_ground()
 
 
 func _attack() -> void:
@@ -137,7 +190,7 @@ func _attack() -> void:
 		func is_enemy(node: Node2D) -> bool: return node.is_in_group(_enemy_player_group)):
 			enemy.health -= attack_damage
 	await _animated_sprite.animation_looped
-	attack_interrupt.emit(InterruptReason.ATTACK_FINISHED)
+	attack_finished.emit()
 
 
 func _die() -> void:
@@ -151,7 +204,7 @@ func _die() -> void:
 # Only connected on server.
 func _on_range_area_body_entered(body: Node2D) -> void:
 	if body.is_in_group(_enemy_player_group):
-		move_interrupt.emit(InterruptReason.ENEMY_ENTERED_RANGE)
+		enemy_entered_range.emit()
 
 
 # Only connected on server.

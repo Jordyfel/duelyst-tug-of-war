@@ -2,11 +2,19 @@ extends Control
 
 
 
+signal left_clicked(event_position: Vector2)
+
 enum Command {RETREAT, ATTACK_MOVE}
 
 var player_last_command: Dictionary = {
-	&"player_1": Command.ATTACK_MOVE,
-	&"player_2": Command.ATTACK_MOVE,
+	&"player_1": {
+		"command": Command.RETREAT,
+		"position": 200.0
+	},
+	&"player_2": {
+		"command": Command.RETREAT,
+		"position": 200.0
+	},
 }
 
 @onready var spawner: MultiplayerSpawner = $MultiplayerSpawner
@@ -20,6 +28,11 @@ func _ready() -> void:
 		Lobby.player_ready()
 	else:
 		Lobby.player_ready.rpc_id(1)
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("left_click"):
+		left_clicked.emit(event.position)
 
 
 # Called only on the server
@@ -48,40 +61,52 @@ func spawn_unit(scene_path: String, unit_position: Vector2, player_group: String
 	add_child(unit, true)
 	unit.position = unit_position
 	unit.set_player(player_group)
-	match player_last_command[player_group]:
+	match player_last_command[player_group]["command"]:
 		Command.RETREAT:
 			unit.retreat()
 		Command.ATTACK_MOVE:
-			unit.attack_move()
+			unit.attack_move(player_last_command[player_group]["position"])
 
 
 @rpc("any_peer")
-func execute_command(command: Command) -> void:
+func retreat() -> void:
 	var player_group: StringName
 	if multiplayer.get_remote_sender_id() == 0:
 		player_group = &"player_1"
 	else:
 		player_group = &"player_2"
-	player_last_command[player_group] = command
+	player_last_command[player_group]["command"] = Command.RETREAT
 	
 	for unit in get_tree().get_nodes_in_group(player_group):
 		if unit is Unit:
-			match command:
-				Command.RETREAT:
-					unit.retreat()
-				Command.ATTACK_MOVE:
-					unit.attack_move()
+				unit.retreat()
+
+
+@rpc("any_peer")
+func attack_move(target_position: float) -> void:
+	var player_group: StringName
+	if multiplayer.get_remote_sender_id() == 0:
+		player_group = &"player_1"
+	else:
+		player_group = &"player_2"
+	player_last_command[player_group]["command"] = Command.ATTACK_MOVE
+	player_last_command[player_group]["position"] = target_position
+	
+	for unit in get_tree().get_nodes_in_group(player_group):
+		if unit is Unit:
+			unit.attack_move(target_position)
 
 
 func _on_retreat_button_pressed() -> void:
 	if multiplayer.is_server():
-		execute_command(Command.RETREAT)
+		retreat()
 	else:
-		execute_command.rpc_id(1, Command.RETREAT)
+		retreat.rpc_id(1)
 
 
 func _on_attack_button_pressed() -> void:
+	var click_position = await left_clicked
 	if multiplayer.is_server():
-		execute_command(Command.ATTACK_MOVE)
+		attack_move(click_position.x)
 	else:
-		execute_command.rpc_id(1, Command.ATTACK_MOVE)
+		attack_move.rpc_id(1, click_position.x)
