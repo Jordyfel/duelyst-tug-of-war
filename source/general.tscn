@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://c4ga71kv8fm1a"]
+[gd_scene load_steps=3 format=3 uid="uid://c4ga71kv8fm1a"]
 
 [ext_resource type="Script" path="res://source/general.gd" id="1_tarrj"]
 
@@ -19,13 +19,6 @@ properties/4/path = NodePath(".:health")
 properties/4/spawn = false
 properties/4/sync = true
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hyo7x"]
-draw_center = false
-shadow_size = 1
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hf134"]
-bg_color = Color(0, 1, 0.219608, 1)
-
 [node name="General" type="CharacterBody2D"]
 collision_layer = 2
 script = ExtResource("1_tarrj")
@@ -36,16 +29,6 @@ script = ExtResource("1_tarrj")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_ywy12")
-
-[node name="ProgressBar" type="ProgressBar" parent="."]
-visible = false
-offset_left = -83.0
-offset_top = -51.0
-offset_right = 89.0
-offset_bottom = -37.0
-theme_override_styles/background = SubResource("StyleBoxFlat_hyo7x")
-theme_override_styles/fill = SubResource("StyleBoxFlat_hf134")
-show_percentage = false
 
 [node name="RangeArea" type="Area2D" parent="."]
 collision_layer = 2

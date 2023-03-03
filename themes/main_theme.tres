@@ -1,6 +1,16 @@
-[gd_resource type="Theme" load_steps=2 format=3 uid="uid://r5ryo3vp6pej"]
+[gd_resource type="Theme" load_steps=4 format=3 uid="uid://r5ryo3vp6pej"]
 
 [ext_resource type="FontFile" uid="uid://cdyhsq24hrjjw" path="res://themes/Exo_2/static/Exo2-Regular.ttf" id="1_pmkxr"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_c1ue3"]
+draw_center = false
+shadow_size = 1
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_npyeg"]
+bg_color = Color(0, 1, 0.219608, 1)
+
 [resource]
 default_font = ExtResource("1_pmkxr")
+default_font_size = 20
+ProgressBar/styles/background = SubResource("StyleBoxFlat_c1ue3")
+ProgressBar/styles/fill = SubResource("StyleBoxFlat_npyeg")

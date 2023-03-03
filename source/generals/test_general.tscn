@@ -24,11 +24,5 @@ scale = Vector2(2, 2)
 sprite_frames = ExtResource("2_fk3hc")
 animation = &"idle"
 
-[node name="ProgressBar" parent="." index="3"]
-offset_left = -90.0
-offset_top = -98.0
-offset_right = 94.0
-offset_bottom = -86.0
-
 [node name="RangeShape" parent="RangeArea" index="0"]
 shape = SubResource("CircleShape2D_auc87")

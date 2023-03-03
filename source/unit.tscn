@@ -1,6 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://dtxadb47bemct"]
+[gd_scene load_steps=4 format=3 uid="uid://dtxadb47bemct"]
 
 [ext_resource type="Script" path="res://source/unit.gd" id="1_i0afq"]
+[ext_resource type="Theme" uid="uid://r5ryo3vp6pej" path="res://themes/main_theme.tres" id="2_b8r4o"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_76c61"]
 properties/0/path = NodePath(".:position")
@@ -25,13 +26,6 @@ properties/6/path = NodePath("AnimatedSprite2D:animation")
 properties/6/spawn = true
 properties/6/sync = true
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mseml"]
-draw_center = false
-shadow_size = 1
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cc7kq"]
-bg_color = Color(0, 1, 0.219608, 1)
-
 [node name="Unit" type="CharacterBody2D"]
 collision_layer = 2
 script = ExtResource("1_i0afq")
@@ -50,8 +44,7 @@ offset_left = -30.0
 offset_top = -30.0
 offset_right = 30.0
 offset_bottom = -26.0
-theme_override_styles/background = SubResource("StyleBoxFlat_mseml")
-theme_override_styles/fill = SubResource("StyleBoxFlat_cc7kq")
+theme = ExtResource("2_b8r4o")
 show_percentage = false
 
 [node name="RangeArea" type="Area2D" parent="."]

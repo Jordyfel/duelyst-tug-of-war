@@ -1,6 +1,10 @@
-[gd_scene load_steps=4 format=3 uid="uid://uunr1pnj12q6"]
+[gd_scene load_steps=6 format=3 uid="uid://uunr1pnj12q6"]
 
+[ext_resource type="Theme" uid="uid://r5ryo3vp6pej" path="res://themes/main_theme.tres" id="1_k21yj"]
 [ext_resource type="Script" path="res://source/game.gd" id="1_v0bo8"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2q7qt"]
+bg_color = Color(0, 0.505882, 1, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7b7ur"]
 bg_color = Color(0.862745, 0.862745, 0.862745, 1)
@@ -15,6 +19,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+theme = ExtResource("1_k21yj")
 script = ExtResource("1_v0bo8")
 
 [node name="BottomBar" type="PanelContainer" parent="."]
@@ -29,14 +34,57 @@ grow_vertical = 0
 
 [node name="MarginContainer" type="MarginContainer" parent="BottomBar"]
 layout_mode = 2
-theme_override_constants/margin_left = 40
+theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 40
+theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 20
 
 [node name="HBoxContainer" type="HBoxContainer" parent="BottomBar/MarginContainer"]
 layout_mode = 2
-theme_override_constants/separation = 20
+
+[node name="Player1" type="VBoxContainer" parent="BottomBar/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(560, 0)
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="HealthBar" type="ProgressBar" parent="BottomBar/MarginContainer/HBoxContainer/Player1"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+value = 100.0
+show_percentage = false
+
+[node name="ManaBar" type="ProgressBar" parent="BottomBar/MarginContainer/HBoxContainer/Player1"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_2q7qt")
+value = 100.0
+show_percentage = false
+
+[node name="HBoxContainer" type="HBoxContainer" parent="BottomBar/MarginContainer/HBoxContainer/Player1"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="PlayerInfo" type="VBoxContainer" parent="BottomBar/MarginContainer/HBoxContainer/Player1/HBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="GeneralIcon" type="TextureRect" parent="BottomBar/MarginContainer/HBoxContainer/Player1/HBoxContainer/PlayerInfo"]
+layout_mode = 2
+size_flags_vertical = 3
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="BottomBar/MarginContainer/HBoxContainer/Player1/HBoxContainer/PlayerInfo"]
+custom_minimum_size = Vector2(128, 0)
+layout_mode = 2
+text = "Player"
+horizontal_alignment = 1
+text_overrun_behavior = 1
+
+[node name="Spacer" type="Control" parent="BottomBar/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
 
 [node name="RetreatButton" type="Button" parent="BottomBar/MarginContainer/HBoxContainer"]
 custom_minimum_size = Vector2(180, 60)
@@ -54,6 +102,51 @@ focus_mode = 0
 theme_override_font_sizes/font_size = 24
 text = "Attack
 "
+
+[node name="Spacer2" type="Control" parent="BottomBar/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Player2" type="VBoxContainer" parent="BottomBar/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(560, 0)
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="HealthBar" type="ProgressBar" parent="BottomBar/MarginContainer/HBoxContainer/Player2"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+value = 100.0
+fill_mode = 1
+show_percentage = false
+
+[node name="ManaBar" type="ProgressBar" parent="BottomBar/MarginContainer/HBoxContainer/Player2"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_2q7qt")
+value = 100.0
+fill_mode = 1
+show_percentage = false
+
+[node name="HBoxContainer" type="HBoxContainer" parent="BottomBar/MarginContainer/HBoxContainer/Player2"]
+layout_mode = 2
+size_flags_vertical = 3
+alignment = 2
+
+[node name="PlayerInfo" type="VBoxContainer" parent="BottomBar/MarginContainer/HBoxContainer/Player2/HBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="GeneralIcon" type="TextureRect" parent="BottomBar/MarginContainer/HBoxContainer/Player2/HBoxContainer/PlayerInfo"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="BottomBar/MarginContainer/HBoxContainer/Player2/HBoxContainer/PlayerInfo"]
+custom_minimum_size = Vector2(128, 0)
+layout_mode = 2
+text = "Player"
+horizontal_alignment = 1
 
 [node name="Background" type="Panel" parent="."]
 custom_minimum_size = Vector2(0, 700)

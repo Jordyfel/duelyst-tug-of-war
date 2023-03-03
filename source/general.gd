@@ -10,36 +10,51 @@ signal enemy_entered_range(enemy: Node2D)
 var _gravity: int = ProjectSettings.get_setting("physics/2d/default_gravity")
 var _my_player_group: StringName
 var _enemy_player_group: StringName
+var _health_bar: ProgressBar
+var _mana_bar: ProgressBar
+
+var mana: int:
+	set(new_mana):
+		new_mana = clampi(new_mana, 0, max_mana)
+		mana = new_mana
+		_mana_bar.value = new_mana
+
+var max_mana: int = 100
 
 var health: int:
 	set(new_health):
 		new_health = clampi(new_health, 0, max_health)
 		health = new_health
-		_progress_bar.value = new_health
-		_progress_bar.visible = not (new_health == max_health)
+		_health_bar.value = new_health
 		if new_health == 0:
-			pass
-#			_die()
+			_die()
 
 @export var max_health: int:
 	set(new_max_health):
 		max_health = new_max_health
 		# Progress bar is not ready for execution from @export, so repeat in _ready().
-		if _progress_bar: 
-			_progress_bar.max_value = new_max_health
+		if _health_bar: 
+			_health_bar.max_value = new_max_health
 
 @export var attack_damage:= 10
 @export var _attack_keyframe:= 1
 
 @onready var _animated_sprite:= $AnimatedSprite2D
-@onready var _progress_bar:= $ProgressBar
 @onready var _range_area:= $RangeArea
 
 
 
 func _ready() -> void:
-	_progress_bar.max_value = max_health
+	if position.x < 800: # I don't have a better idea yet.
+		_health_bar = $/root/Game/BottomBar/MarginContainer/HBoxContainer/Player1/HealthBar
+		_mana_bar = $/root/Game/BottomBar/MarginContainer/HBoxContainer/Player1/ManaBar
+	else:
+		_health_bar = $/root/Game/BottomBar/MarginContainer/HBoxContainer/Player2/HealthBar
+		_mana_bar = $/root/Game/BottomBar/MarginContainer/HBoxContainer/Player2/ManaBar
+	
+	_health_bar.max_value = max_health
 	health = max_health
+	mana = 0
 	
 	if not multiplayer.is_server():
 		return
@@ -62,6 +77,7 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 
+# Must be called before ready; call before add_child()
 func set_player(player: StringName) -> void:
 	add_to_group(player)
 	_my_player_group = player
