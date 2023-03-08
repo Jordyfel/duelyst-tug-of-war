@@ -3,6 +3,7 @@ class_name Unit
 
 
 
+signal died
 signal action_changed
 signal enemy_entered_range
 signal reached_target_position
@@ -38,8 +39,9 @@ var health: int:
 			_die()
 
 @export var retreat_distance_from_wall:= 150.0
-@export var initial_spawn_time: int
-@export var spawn_time: int
+@export var max_count:= 1
+@export var initial_spawn_time:= 1
+@export var spawn_time:= 5
 
 @export var max_health: int:
 	set(new_max_health):
@@ -90,6 +92,10 @@ func _physics_process(delta: float) -> void:
 	if position.x - POSITION_VARIANCE < _move_target_position:
 		if position.x + POSITION_VARIANCE > _move_target_position:
 			reached_target_position.emit()
+
+
+func get_thumbnail() -> Texture2D:
+	return _animated_sprite.get_sprite_frames().get_frame_texture(&"idle", 0)
 
 
 func set_player(player: StringName) -> void:
@@ -194,6 +200,7 @@ func _attack() -> void:
 
 
 func _die() -> void:
+	died.emit()
 	for group in get_groups():
 		remove_from_group(group)
 	_animated_sprite.play(&"death")

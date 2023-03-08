@@ -137,8 +137,8 @@ layout_mode = 2
 alignment = 1
 
 [node name="GeneralIcon" type="TextureRect" parent="BottomBar/MarginContainer/HBoxContainer/Player2/HBoxContainer/PlayerInfo"]
-custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
+size_flags_vertical = 3
 expand_mode = 1
 stretch_mode = 5
 
@@ -157,9 +157,17 @@ grow_horizontal = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_7b7ur")
 
-[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
+[node name="GeneralSpawner" type="MultiplayerSpawner" parent="."]
 _spawnable_scenes = PackedStringArray("res://source/units/test_unit.tscn", "res://source/units/test_unit_2.tscn", "res://source/generals/test_general.tscn")
 spawn_path = NodePath("..")
+
+[node name="UnitElementSpawner1" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("res://source/unit_element.tscn")
+spawn_path = NodePath("../BottomBar/MarginContainer/HBoxContainer/Player1/HBoxContainer")
+
+[node name="UnitElementSpawner2" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("res://source/unit_element.tscn")
+spawn_path = NodePath("../BottomBar/MarginContainer/HBoxContainer/Player2/HBoxContainer")
 
 [node name="Floor" type="StaticBody2D" parent="."]
 position = Vector2(0, 650)

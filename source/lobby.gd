@@ -8,7 +8,14 @@ const MAX_PLAYERS = 2
 var peer: ENetMultiplayerPeer
 var players:= {}
 var players_ready:= 0
-var player_name:= "Name"
+var player_info = {
+	"name": "Name",
+	"general_path": "res://source/generals/test_general.tscn",
+	"unit_paths": [
+		"res://source/units/test_unit.tscn",
+		"res://source/units/test_unit_2.tscn",
+	]
+}
 
 
 
@@ -24,6 +31,9 @@ func create_game():
 	peer = ENetMultiplayerPeer.new()
 	peer.create_server(PORT)
 	multiplayer.set_multiplayer_peer(peer)
+	
+	player_info["player_group"] = &"player_1"
+	players[1] = player_info
 
 
 func join_game(address: String = "84.1.46.236"):
@@ -33,10 +43,11 @@ func join_game(address: String = "84.1.46.236"):
 
 
 @rpc("any_peer")
-func register_player(new_player_name: String):
+func register_player(new_player_info: Dictionary) -> void:
 	var id = multiplayer.get_remote_sender_id()
-	players[id] = new_player_name
-	if multiplayer.is_server() and players.size() == MAX_PLAYERS - 1:
+	new_player_info["player_group"] = &"player_2"
+	players[id] = new_player_info
+	if multiplayer.is_server() and players.size() == MAX_PLAYERS:
 		load_game.rpc()
 
 
@@ -58,7 +69,7 @@ func unregister_player(id):
 
 
 func _player_connected(id):
-	register_player.rpc_id(id, player_name)
+	register_player.rpc_id(id, player_info)
 
 
 func _player_disconnected(id):

@@ -1,4 +1,5 @@
 extends Control
+class_name Game
 
 
 
@@ -17,10 +18,6 @@ var player_last_command: Dictionary = {
 	},
 }
 
-@onready var spawner: MultiplayerSpawner = $MultiplayerSpawner
-@onready var player_1_unit_spawn:= $Player1UnitSpawn
-@onready var player_2_unit_spawn:= $Player2UnitSpawn
-
 
 
 func _ready() -> void:
@@ -37,13 +34,12 @@ func _unhandled_input(event: InputEvent) -> void:
 
 # Called only on the server
 func start_game() -> void:
-	spawn_general("res://source/generals/test_general.tscn", &"player_1")
-	spawn_general("res://source/generals/test_general.tscn", &"player_2")
-	
-	while(true):
-		spawn_unit("res://source/units/test_unit.tscn", player_1_unit_spawn.position, &"player_1")
-		spawn_unit("res://source/units/test_unit_2.tscn", player_2_unit_spawn.position, &"player_2")
-		await get_tree().create_timer(5).timeout
+	for player_id in Lobby.players:
+		var player = Lobby.players[player_id]
+		spawn_general(player["general_path"], player["player_group"])
+		for unit_path in player["unit_paths"]:
+			var spawner = UnitSpawner.new(unit_path, player["player_group"])
+			add_child(spawner, true)
 
 
 func spawn_general(scene_path: String, player_group: StringName) -> void:
@@ -56,16 +52,28 @@ func spawn_general(scene_path: String, player_group: StringName) -> void:
 	add_child(general, true)
 
 
-func spawn_unit(scene_path: String, unit_position: Vector2, player_group: StringName) -> void:
-	var unit: Unit = load(scene_path).instantiate()
-	add_child(unit, true)
-	unit.position = unit_position
-	unit.set_player(player_group)
-	match player_last_command[player_group]["command"]:
-		Command.RETREAT:
-			unit.retreat()
-		Command.ATTACK_MOVE:
-			unit.attack_move(player_last_command[player_group]["position"])
+func spawn_unit(scene_path: String, player_group: StringName) -> void:
+	var first_unit:= true
+	while true:
+		var unit: Unit = load(scene_path).instantiate()
+		
+		if first_unit:
+			await get_tree().create_timer(unit.initial_spawn_time).timeout
+			first_unit = false
+		
+		if player_group == &"player_1":
+			unit.position = $Player1UnitSpawn.position
+		elif player_group == &"player_2":
+			unit.position = $Player2UnitSpawn.position
+		unit.set_player(player_group)
+		add_child(unit, true)
+		match player_last_command[player_group]["command"]:
+			Command.RETREAT:
+				unit.retreat()
+			Command.ATTACK_MOVE:
+				unit.attack_move(player_last_command[player_group]["position"])
+		
+		await get_tree().create_timer(unit.spawn_time).timeout
 
 
 @rpc("any_peer")
