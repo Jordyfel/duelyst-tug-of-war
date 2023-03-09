@@ -5,11 +5,14 @@ class_name UnitSpawner
 
 signal unit_died
 
+enum Command {RETREAT, ATTACK_MOVE}
+
 var unit_scene_path: String
 var player_group: StringName
 var spawn_position: Vector2
 var element_container: Node
 var unit_element: UnitElement
+var last_command:= {"command": Command.RETREAT}
 
 @onready var game:= $/root/Game
 
@@ -39,6 +42,7 @@ func spawn_unit() -> void:
 		
 		if first_unit:
 			unit_element = load("res://source/unit_element.tscn").instantiate()
+			unit_element.unit_name = unit.unique_name
 			unit_element.max_unit_count = unit.max_count
 			element_container.add_child(unit_element, true)
 			
@@ -56,11 +60,11 @@ func spawn_unit() -> void:
 		game.add_child(unit, true)
 		unit.died.connect(_on_unit_died)
 		unit_element.unit_count += 1
-		match game.player_last_command[player_group]["command"]:
-			Game.Command.RETREAT:
+		match last_command["command"]:
+			Command.RETREAT:
 				unit.retreat()
-			Game.Command.ATTACK_MOVE:
-				unit.attack_move(game.player_last_command[player_group]["position"])
+			Command.ATTACK_MOVE:
+				unit.attack_move(last_command["position"])
 		
 		if unit_element.unit_count == unit_element.max_unit_count:
 			await unit_died

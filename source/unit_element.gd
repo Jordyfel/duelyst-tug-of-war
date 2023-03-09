@@ -1,24 +1,25 @@
-extends VBoxContainer
+extends PanelContainer
 class_name UnitElement
 
 
 
 var max_unit_count:= 0
 var spawn_time:= 0.0
+var ticking:= false
+var unit_name: StringName
 
 var unit_count:= 0:
 	set(new_unit_count):
 		unit_count = new_unit_count
-		$Label.set_text(str(new_unit_count) + "/" + str(max_unit_count))
+		$VBoxContainer/Label.set_text(str(new_unit_count) + "/" + str(max_unit_count))
 
-var ticking:= false
 
-@onready var progress_bar:= $ProgressBar
+@onready var progress_bar:= $VBoxContainer/ProgressBar
 
 
 
 func _ready() -> void:
-	$Label.set_text(str(unit_count) + "/" + str(max_unit_count))
+	$VBoxContainer/Label.set_text(str(unit_count) + "/" + str(max_unit_count))
 
 
 func _process(delta: float) -> void:
@@ -29,6 +30,12 @@ func _process(delta: float) -> void:
 			progress_bar.value = 0
 
 
+@rpc
+func set_focusable(focusable: bool):
+	if focusable:
+		set_focus_mode(Control.FOCUS_CLICK)
+
+
 @rpc("call_local")
 func start_progressing(time: float) -> void:
 	progress_bar.max_value = time
@@ -37,4 +44,12 @@ func start_progressing(time: float) -> void:
 
 @rpc("call_local")
 func set_image(unit_node_path: NodePath):
-	$TextureRect.set_texture(get_node(unit_node_path).get_thumbnail())
+	$VBoxContainer/TextureRect.set_texture(get_node(unit_node_path).get_thumbnail())
+
+
+func _on_focus_entered() -> void:
+	add_theme_stylebox_override(&"panel", load("res://themes/highlight_stylebox.tres"))
+
+
+func _on_focus_exited() -> void:
+	add_theme_stylebox_override(&"panel", load("res://themes/transparent_stylebox.tres"))

@@ -38,6 +38,7 @@ var health: int:
 		if new_health == 0:
 			_die()
 
+@export var unique_name: StringName
 @export var retreat_distance_from_wall:= 150.0
 @export var max_count:= 1
 @export var initial_spawn_time:= 1
@@ -61,6 +62,7 @@ var health: int:
 
 
 func _ready() -> void:
+	add_to_group(unique_name)
 	_progress_bar.max_value = max_health
 	health = max_health
 	

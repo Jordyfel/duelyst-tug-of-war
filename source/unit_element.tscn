@@ -1,6 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://rmfxt1rbd8xv"]
+[gd_scene load_steps=6 format=3 uid="uid://rmfxt1rbd8xv"]
 
 [ext_resource type="Script" path="res://source/unit_element.gd" id="1_bir0r"]
+[ext_resource type="StyleBox" uid="uid://b5syy8lsycr02" path="res://themes/transparent_stylebox.tres" id="1_ca180"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_r1mef"]
 draw_center = false
@@ -16,27 +17,35 @@ properties/0/sync = true
 properties/1/path = NodePath(".:max_unit_count")
 properties/1/spawn = true
 properties/1/sync = false
+properties/2/path = NodePath(".:unit_name")
+properties/2/spawn = true
+properties/2/sync = false
 
-[node name="UnitElement" type="VBoxContainer"]
+[node name="UnitElement" type="PanelContainer"]
 offset_right = 64.0
 offset_bottom = 64.0
 size_flags_vertical = 4
+theme_override_styles/panel = ExtResource("1_ca180")
 script = ExtResource("1_bir0r")
 
-[node name="TextureRect" type="TextureRect" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer"]
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="ProgressBar" type="ProgressBar" parent="."]
-custom_minimum_size = Vector2(0, 4)
+[node name="ProgressBar" type="ProgressBar" parent="VBoxContainer"]
+custom_minimum_size = Vector2(58, 4)
 layout_mode = 2
+size_flags_horizontal = 4
 theme_override_styles/background = SubResource("StyleBoxFlat_r1mef")
 theme_override_styles/fill = SubResource("StyleBoxFlat_b57f3")
 show_percentage = false
 
-[node name="Label" type="Label" parent="."]
+[node name="Label" type="Label" parent="VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "1/10"
@@ -45,3 +54,6 @@ vertical_alignment = 1
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_dnute")
+
+[connection signal="focus_entered" from="." to="." method="_on_focus_entered"]
+[connection signal="focus_exited" from="." to="." method="_on_focus_exited"]

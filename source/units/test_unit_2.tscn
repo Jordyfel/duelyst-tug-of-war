@@ -10,6 +10,7 @@ size = Vector2(63, 40)
 radius = 30.0
 
 [node name="Unit" instance=ExtResource("1_6vlpp")]
+unique_name = &"Test Unit 2"
 max_count = 5
 initial_spawn_time = 3
 max_health = 80

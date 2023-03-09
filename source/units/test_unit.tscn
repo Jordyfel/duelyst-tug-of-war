@@ -9,7 +9,8 @@ size = Vector2(43, 51)
 [sub_resource type="CircleShape2D" id="CircleShape2D_n2vtj"]
 radius = 30.0
 
-[node name="Unit" instance=ExtResource("1_v4qkm")]
+[node name="Unit" groups=["test_unit"] instance=ExtResource("1_v4qkm")]
+unique_name = &"Test Unit"
 max_count = 5
 initial_spawn_time = 3
 max_health = 100
