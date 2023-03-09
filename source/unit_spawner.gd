@@ -42,6 +42,11 @@ func spawn_unit() -> void:
 			unit_element.max_unit_count = unit.max_count
 			element_container.add_child(unit_element, true)
 			
+			game.add_child(unit, true)
+			unit_element.set_image.rpc(unit.get_path())
+			unit.queue_free()
+			unit = load(unit_scene_path).instantiate()
+			
 			unit_element.start_progressing.rpc(unit.initial_spawn_time)
 			await get_tree().create_timer(unit.initial_spawn_time).timeout
 			first_unit = false
@@ -50,7 +55,6 @@ func spawn_unit() -> void:
 		unit.set_player(player_group)
 		game.add_child(unit, true)
 		unit.died.connect(_on_unit_died)
-		#unit_element.set_image.rpc(unit.get_thumbnail()) #aaaaa
 		unit_element.unit_count += 1
 		match game.player_last_command[player_group]["command"]:
 			Game.Command.RETREAT:

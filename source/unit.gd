@@ -106,7 +106,7 @@ func set_player(player: StringName) -> void:
 			_retreat_position = retreat_distance_from_wall
 			_enemy_player_group = &"player_2"
 		&"player_2":
-			# The literal should be adapted to level size.
+			# This literal should be the level size.
 			_retreat_position = 1600 - retreat_distance_from_wall
 			_enemy_player_group = &"player_1"
 

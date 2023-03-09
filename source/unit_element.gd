@@ -36,5 +36,5 @@ func start_progressing(time: float) -> void:
 
 
 @rpc("call_local")
-func set_image(texture: Texture2D):
-	$MaskPanel/TextureRect.set_texture(texture)
+func set_image(unit_node_path: NodePath):
+	$TextureRect.set_texture(get_node(unit_node_path).get_thumbnail())

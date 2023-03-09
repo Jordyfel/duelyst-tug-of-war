@@ -23,18 +23,11 @@ offset_bottom = 64.0
 size_flags_vertical = 4
 script = ExtResource("1_bir0r")
 
-[node name="MaskPanel" type="Panel" parent="."]
-clip_children = 1
+[node name="TextureRect" type="TextureRect" parent="."]
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
-
-[node name="TextureRect" type="TextureRect" parent="MaskPanel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
 
 [node name="ProgressBar" type="ProgressBar" parent="."]
 custom_minimum_size = Vector2(0, 4)

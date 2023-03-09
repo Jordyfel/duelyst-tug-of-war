@@ -3,19 +3,14 @@ class_name Game
 
 
 
-signal left_clicked(event_position: Vector2)
+signal left_clicked
+signal right_clicked
 
 enum Command {RETREAT, ATTACK_MOVE}
 
 var player_last_command: Dictionary = {
-	&"player_1": {
-		"command": Command.RETREAT,
-		"position": 200.0
-	},
-	&"player_2": {
-		"command": Command.RETREAT,
-		"position": 200.0
-	},
+	&"player_1": {"command": Command.RETREAT},
+	&"player_2": {"command": Command.RETREAT},
 }
 
 
@@ -29,7 +24,9 @@ func _ready() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("left_click"):
-		left_clicked.emit(event.position)
+		left_clicked.emit()
+	elif event.is_action_pressed("right_click"):
+		right_clicked.emit()
 
 
 # Called only on the server
@@ -50,30 +47,6 @@ func spawn_general(scene_path: String, player_group: StringName) -> void:
 		general.position = $Player2GeneralPosition.position
 	general.set_player(player_group)
 	add_child(general, true)
-
-
-func spawn_unit(scene_path: String, player_group: StringName) -> void:
-	var first_unit:= true
-	while true:
-		var unit: Unit = load(scene_path).instantiate()
-		
-		if first_unit:
-			await get_tree().create_timer(unit.initial_spawn_time).timeout
-			first_unit = false
-		
-		if player_group == &"player_1":
-			unit.position = $Player1UnitSpawn.position
-		elif player_group == &"player_2":
-			unit.position = $Player2UnitSpawn.position
-		unit.set_player(player_group)
-		add_child(unit, true)
-		match player_last_command[player_group]["command"]:
-			Command.RETREAT:
-				unit.retreat()
-			Command.ATTACK_MOVE:
-				unit.attack_move(player_last_command[player_group]["position"])
-		
-		await get_tree().create_timer(unit.spawn_time).timeout
 
 
 @rpc("any_peer")
@@ -113,8 +86,15 @@ func _on_retreat_button_pressed() -> void:
 
 
 func _on_attack_button_pressed() -> void:
-	var click_position = await left_clicked
-	if multiplayer.is_server():
-		attack_move(click_position.x)
-	else:
-		attack_move.rpc_id(1, click_position.x)
+	var target_indicator = load("res://source/target_indicator.tscn").instantiate()
+	add_child(target_indicator)
+	
+	var promise = PromiseAny.new([left_clicked, right_clicked])
+	var input = await promise.completed
+	if input == left_clicked:
+		if multiplayer.is_server():
+			attack_move(get_global_mouse_position().x)
+		else:
+			attack_move.rpc_id(1, get_global_mouse_position().x)
+	
+	target_indicator.queue_free()
