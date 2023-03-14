@@ -11,15 +11,12 @@ shadow_size = 1
 bg_color = Color(0.478431, 0.478431, 0.478431, 1)
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_dnute"]
-properties/0/path = NodePath(".:unit_count")
-properties/0/spawn = false
-properties/0/sync = true
-properties/1/path = NodePath(".:max_unit_count")
+properties/0/path = NodePath(".:max_unit_count")
+properties/0/spawn = true
+properties/0/sync = false
+properties/1/path = NodePath(".:unit_name")
 properties/1/spawn = true
 properties/1/sync = false
-properties/2/path = NodePath(".:unit_name")
-properties/2/spawn = true
-properties/2/sync = false
 
 [node name="UnitElement" type="PanelContainer"]
 offset_right = 64.0

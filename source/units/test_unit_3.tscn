@@ -1,0 +1,30 @@
+[gd_scene load_steps=5 format=3 uid="uid://buw5tiqfv510k"]
+
+[ext_resource type="PackedScene" uid="uid://dtxadb47bemct" path="res://source/unit.tscn" id="1_wui8t"]
+[ext_resource type="SpriteFrames" uid="uid://b25a04koj2d35" path="res://addons/duelyst_animated_sprites/assets/spriteframes/units/neutral_yun.tres" id="2_c6mns"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_t5h2f"]
+size = Vector2(29, 37)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_xu8qj"]
+radius = 35.7351
+
+[node name="Unit" instance=ExtResource("1_wui8t")]
+unique_name = &"Test Unit 3"
+max_count = 9
+initial_spawn_time = 5
+spawn_time = 10
+max_health = 200
+movement_speed = 150.0
+attack_damage = 30
+
+[node name="CollisionShape2D" parent="." index="0"]
+position = Vector2(0.5, 17.5)
+shape = SubResource("RectangleShape2D_t5h2f")
+
+[node name="AnimatedSprite2D" parent="." index="1"]
+sprite_frames = ExtResource("2_c6mns")
+animation = &"idle"
+
+[node name="RangeShape" parent="RangeArea" index="0"]
+shape = SubResource("CircleShape2D_xu8qj")

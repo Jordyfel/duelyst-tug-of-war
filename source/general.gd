@@ -26,7 +26,7 @@ var health: int:
 		new_health = clampi(new_health, 0, max_health)
 		health = new_health
 		_health_bar.value = new_health
-		if new_health == 0:
+		if new_health == 0 and multiplayer.is_server():
 			_die()
 
 @export var max_health: int:
@@ -51,6 +51,7 @@ func _ready() -> void:
 	else:
 		_health_bar = $/root/Game/BottomBar/MarginContainer/HBoxContainer/Player2/HealthBar
 		_mana_bar = $/root/Game/BottomBar/MarginContainer/HBoxContainer/Player2/ManaBar
+		_animated_sprite.set_flip_h(true)
 	
 	_health_bar.max_value = max_health
 	health = max_health
@@ -59,12 +60,10 @@ func _ready() -> void:
 	if not multiplayer.is_server():
 		return
 	
-	if _my_player_group == &"player_2":
-		_animated_sprite.set_flip_h(true)
 	_animated_sprite.frame_changed.connect(_on_animated_sprite_2d_frame_changed)
 	_range_area.body_entered.connect(_on_range_area_body_entered)
 	
-	_hold_your_ground()
+	_hold_your_ground.call_deferred()
 
 
 func _physics_process(delta: float) -> void:
@@ -94,12 +93,12 @@ func _hold_your_ground():
 				func is_enemy(node: Node2D) -> bool: return node.is_in_group(_enemy_player_group)):
 			await _attack()
 			continue
-		_animated_sprite.play(&"idle")
+		play_animation.rpc(&"idle")
 		await enemy_entered_range
 
 
 func _attack() -> void:
-	_animated_sprite.play(&"attack")
+	play_animation.rpc(&"attack")
 	await attack_keyframe_reached
 	for enemy in _range_area.get_overlapping_bodies().filter(
 		func is_enemy(node: Node2D) -> bool: return node.is_in_group(_enemy_player_group)):
@@ -109,7 +108,7 @@ func _attack() -> void:
 
 func _die() -> void:
 	game_lost.emit(self)
-	_animated_sprite.play(&"death")
+	play_animation.rpc(&"death")
 	await _animated_sprite.animation_looped
 	queue_free()
 
@@ -125,3 +124,13 @@ func _on_animated_sprite_2d_frame_changed() -> void:
 	if _animated_sprite.get_animation() == &"attack":
 		if _animated_sprite.get_frame() == _attack_keyframe:
 			attack_keyframe_reached.emit()
+
+
+@rpc("call_local")
+func set_health(new_health: int):
+	health = new_health
+
+
+@rpc("call_local")
+func play_animation(animation: StringName):
+	_animated_sprite.play(animation)

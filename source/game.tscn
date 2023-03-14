@@ -158,7 +158,7 @@ mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_7b7ur")
 
 [node name="GeneralSpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("res://source/units/test_unit.tscn", "res://source/units/test_unit_2.tscn", "res://source/generals/test_general.tscn")
+_spawnable_scenes = PackedStringArray("res://source/generals/test_general.tscn", "res://source/units/test_unit.tscn", "res://source/units/test_unit_2.tscn", "res://source/units/test_unit_3.tscn")
 spawn_path = NodePath("..")
 
 [node name="UnitElementSpawner1" type="MultiplayerSpawner" parent="."]

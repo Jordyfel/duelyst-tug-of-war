@@ -25,9 +25,9 @@ var _movement_mode:= MovementMode.STILL:
 	set(new_mode):
 		_movement_mode = new_mode
 		if new_mode == MovementMode.RIGHT:
-			_animated_sprite.set_flip_h(false)
+			set_flip_h.rpc(false)
 		elif new_mode == MovementMode.LEFT:
-			_animated_sprite.set_flip_h(true)
+			set_flip_h.rpc(true)
 
 var health: int:
 	set(new_health):
@@ -35,15 +35,17 @@ var health: int:
 		health = new_health
 		_progress_bar.value = new_health
 		_progress_bar.visible = not (new_health == max_health)
-		if new_health == 0:
+		if new_health == 0 and multiplayer.is_server():
 			_die()
 
 @export var unique_name: StringName
-@export var retreat_distance_from_wall:= 150.0
+@export_group("Spawn")
+
 @export var max_count:= 1
 @export var initial_spawn_time:= 1
 @export var spawn_time:= 5
 
+@export_group("Combat")
 @export var max_health: int:
 	set(new_max_health):
 		max_health = new_max_health
@@ -53,7 +55,8 @@ var health: int:
 
 @export var movement_speed = 100.0
 @export var attack_damage:= 10
-@export var _attack_keyframe:= 1
+@export var attack_keyframe:= 1
+@export var retreat_distance_from_wall:= 150.0
 
 @onready var _animated_sprite:= $AnimatedSprite2D
 @onready var _progress_bar:= $ProgressBar
@@ -135,7 +138,7 @@ func attack_move(target_position: float) -> void:
 		else:
 			_hold_your_ground()
 			break
-		_animated_sprite.play(&"run")
+		play_animation.rpc(&"run")
 		
 		var promise = PromiseAny.new([enemy_entered_range, action_changed, reached_target_position])
 		var source = await promise.completed
@@ -160,7 +163,7 @@ func _hold_your_ground() -> void:
 				continue
 			elif source == action_changed:
 				break
-		_animated_sprite.play(&"idle")
+		play_animation.rpc(&"idle")
 		var promise = PromiseAny.new([enemy_entered_range, action_changed])
 		var source = await promise.completed
 		if source == enemy_entered_range:
@@ -182,7 +185,7 @@ func retreat() -> void:
 	else:
 		_hold_your_ground()
 		return
-	_animated_sprite.play(&"run")
+	play_animation.rpc(&"run")
 	
 	var promise = PromiseAny.new([action_changed, reached_target_position])
 	var source = await promise.completed
@@ -192,11 +195,11 @@ func retreat() -> void:
 
 func _attack() -> void:
 	_movement_mode = MovementMode.STILL
-	_animated_sprite.play(&"attack")
+	play_animation.rpc(&"attack")
 	await attack_keyframe_reached
 	for enemy in _range_area.get_overlapping_bodies().filter(
 		func is_enemy(node: Node2D) -> bool: return node.is_in_group(_enemy_player_group)):
-			enemy.health -= attack_damage
+			enemy.set_health.rpc(enemy.health - attack_damage)
 	await _animated_sprite.animation_looped
 	attack_finished.emit()
 
@@ -205,7 +208,7 @@ func _die() -> void:
 	died.emit()
 	for group in get_groups():
 		remove_from_group(group)
-	_animated_sprite.play(&"death")
+	play_animation.rpc(&"death")
 	await _animated_sprite.animation_looped
 	queue_free()
 
@@ -219,5 +222,21 @@ func _on_range_area_body_entered(body: Node2D) -> void:
 # Only connected on server.
 func _on_animated_sprite_2d_frame_changed() -> void:
 	if _animated_sprite.get_animation() == &"attack":
-		if _animated_sprite.get_frame() == _attack_keyframe:
+		if _animated_sprite.get_frame() == attack_keyframe:
 			attack_keyframe_reached.emit()
+
+
+@rpc("call_local")
+func set_health(new_health: int):
+	health = new_health
+
+
+@rpc("call_local")
+func set_flip_h(new_flip_h: bool):
+	_animated_sprite.set_flip_h(new_flip_h)
+
+
+@rpc("call_local")
+func play_animation(animation: StringName):
+	_animated_sprite.play(animation)
+

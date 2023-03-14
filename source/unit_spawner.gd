@@ -1,4 +1,4 @@
-extends MultiplayerSpawner
+extends Node
 class_name UnitSpawner
 
 
@@ -24,7 +24,6 @@ func _init(new_unit_scene_path: String, new_player_group: StringName) -> void:
 
 
 func _ready() -> void:
-	spawn_path = ^"/root/Game/"
 	if player_group == &"player_1":
 		spawn_position = $/root/Game/Player1UnitSpawn.position
 		element_container = $/root/Game/BottomBar/MarginContainer/HBoxContainer/Player1/HBoxContainer

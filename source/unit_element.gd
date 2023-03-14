@@ -12,6 +12,8 @@ var unit_count:= 0:
 	set(new_unit_count):
 		unit_count = new_unit_count
 		$VBoxContainer/Label.set_text(str(new_unit_count) + "/" + str(max_unit_count))
+		if multiplayer.is_server():
+			set_unit_count.rpc(new_unit_count)
 
 
 @onready var progress_bar:= $VBoxContainer/ProgressBar
@@ -45,6 +47,11 @@ func start_progressing(time: float) -> void:
 @rpc("call_local")
 func set_image(unit_node_path: NodePath):
 	$VBoxContainer/TextureRect.set_texture(get_node(unit_node_path).get_thumbnail())
+
+
+@rpc
+func set_unit_count(new_unit_count: int):
+	unit_count = new_unit_count
 
 
 func _on_focus_entered() -> void:

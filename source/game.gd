@@ -6,7 +6,7 @@ class_name Game
 signal left_clicked
 signal right_clicked
 
-var spawners:= {}
+var spawners:= {&"player_1": {}, &"player_2": {}}
 
 
 
@@ -35,7 +35,7 @@ func start_game() -> void:
 	
 	for unit_spawner in get_children():
 		if unit_spawner is UnitSpawner:
-			spawners[unit_spawner.unit_element.unit_name] = unit_spawner
+			spawners[unit_spawner.player_group][unit_spawner.unit_element.unit_name] = unit_spawner
 	
 	for unit_element in $BottomBar/MarginContainer/HBoxContainer/Player1/HBoxContainer.get_children():
 		if unit_element is UnitElement:
@@ -62,7 +62,7 @@ func retreat(unit_name: StringName) -> void:
 		player_group = &"player_1"
 	else:
 		player_group = &"player_2"
-	spawners[unit_name].last_command["command"] = UnitSpawner.Command.RETREAT
+	spawners[player_group][unit_name].last_command["command"] = UnitSpawner.Command.RETREAT
 	
 	for unit in get_tree().get_nodes_in_group(unit_name):
 		if unit.is_in_group(player_group):
@@ -76,8 +76,8 @@ func attack_move(unit_name: StringName, target_position: float) -> void:
 		player_group = &"player_1"
 	else:
 		player_group = &"player_2"
-	spawners[unit_name].last_command["command"] = UnitSpawner.Command.ATTACK_MOVE
-	spawners[unit_name].last_command["position"] = target_position
+	spawners[player_group][unit_name].last_command["command"] = UnitSpawner.Command.ATTACK_MOVE
+	spawners[player_group][unit_name].last_command["position"] = target_position
 	
 	for unit in get_tree().get_nodes_in_group(unit_name):
 		if unit.is_in_group(player_group):
